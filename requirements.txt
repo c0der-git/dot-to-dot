@@ -1,6 +1,13 @@
+Flask
+Jinja2
+Werkzeug
 cairocffi
 gunicorn
+numpy
+opencv-python
 ortools
+pandas
 Pillow
 protobuf
+scipy
 six
