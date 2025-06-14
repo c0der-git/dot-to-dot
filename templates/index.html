@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dot-to-Dot Image Processor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .image-box {
+            width: 100%;
+            aspect-ratio: 1/1;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+            border: 1px solid #dee2e6;
+            min-height: 350px;
+            max-width: 500px;
+            margin: 0 auto;
+            overflow: hidden;
+            position: relative;
+        }
+        .image-box img.preview, .image-box img.result {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+        .image-box .default-icon {
+            width: 60%;
+            max-width: 220px;
+            height: auto;
+            opacity: 0.18;
+            display: block;
+            margin: 0 auto 10px auto;
+        }
+        .image-box .overlay-btns, .image-box .overlay-download {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+            z-index: 2;
+        }
+        .image-box .overlay-download {
+            display: flex;
+        }
+        .choose-file-btn {
+            margin-top: 18px;
+        }
+        .centered-row {
+            justify-content: center;
+        }
+        @media (max-width: 767px) {
+            .image-box { min-height: 200px; max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+<div class="container py-4">
+    <h1 class="mb-4 text-center">Dot-to-Dot Image Processor</h1>
+    <div class="row g-4 flex-column flex-md-row centered-row" id="tiles-row">
+        <div class="col-12 col-md-6 order-1 d-flex justify-content-center" id="original-tile">
+            <div class="card h-100 w-100" style="max-width: 600px;">
+                <div class="card-header text-center">Original Image</div>
+                <div class="card-body d-flex align-items-center justify-content-center">
+                    <div class="image-box" id="image-box">
+                        <span id="no-image-text" class="text-muted w-100 text-center mb-2">Please select an image</span>
+                        <img id="default-icon" class="default-icon" src="https://upload.wikimedia.org/wikipedia/commons/6/6b/Picture_icon_BLACK.svg" alt="default file icon" />
+                        <img id="preview-img" class="preview" style="display: none;" />
+                        <div class="overlay-btns" id="overlay-btns" style="display:none;">
+                            <button id="generate-btn" class="btn btn-primary btn-sm">Generate</button>
+                            <button id="reset-btn" class="btn btn-secondary btn-sm">Reset</button>
+                        </div>
+                        <input class="form-control" type="file" id="file" name="file" required accept="image/*" style="display:none;" onchange="onFileChange(event)">
+                        <button id="choose-btn" class="btn btn-outline-primary choose-file-btn" type="button">Choose File</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 order-2 d-none" id="result-tile">
+            <div class="card h-100">
+                <div class="card-header text-center">Result Image</div>
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <div id="progress-section" class="w-100 mb-3" style="display:none;">
+                        <div class="progress mb-2" style="height: 30px;">
+                            <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%">0%</div>
+                        </div>
+                        <div id="status">Starting...</div>
+                    </div>
+                    <div id="result-section" class="w-100" style="display:none;">
+                        <div class="image-box mb-3" id="result-image-box" style="position:relative;">
+                            <img id="result-img" class="result" />
+                            <div class="overlay-download" id="overlay-download">
+                                <a id="download-link" href="#" class="btn btn-success btn-sm" download>Download</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+let selectedFile = null;
+const chooseBtn = document.getElementById('choose-btn');
+const fileInput = document.getElementById('file');
+const previewImg = document.getElementById('preview-img');
+const noImg = document.getElementById('no-image-text');
+const defaultIcon = document.getElementById('default-icon');
+const overlayBtns = document.getElementById('overlay-btns');
+const resultTile = document.getElementById('result-tile');
+
+chooseBtn.onclick = function() {
+    fileInput.click();
+};
+
+function onFileChange(event) {
+    const file = event.target.files[0];
+    selectedFile = file;
+    if (!file) {
+        previewImg.style.display = 'none';
+        noImg.style.display = 'block';
+        defaultIcon.style.display = 'block';
+        chooseBtn.style.display = 'block';
+        overlayBtns.style.display = 'none';
+        resultTile.classList.add('d-none');
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        previewImg.src = e.target.result;
+        previewImg.style.display = 'block';
+        noImg.style.display = 'none';
+        defaultIcon.style.display = 'none';
+        chooseBtn.style.display = 'none';
+        overlayBtns.style.display = 'flex';
+        resultTile.classList.add('d-none');
+    };
+    reader.readAsDataURL(file);
+}
+
+document.getElementById('generate-btn').onclick = function(e) {
+    e.preventDefault();
+    if (!selectedFile) return;
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    document.getElementById('progress-section').style.display = 'block';
+    document.getElementById('result-section').style.display = 'none';
+    document.getElementById('progress-bar').style.width = '0%';
+    document.getElementById('progress-bar').innerText = '0%';
+    document.getElementById('status').innerText = 'Starting...';
+    resultTile.classList.remove('d-none');
+    // For mobile: move result tile above original if small screen
+    if (window.innerWidth < 768) {
+        const row = document.getElementById('tiles-row');
+        const resultTile = document.getElementById('result-tile');
+        row.insertBefore(resultTile, row.firstChild);
+    }
+    fetch('/', {
+        method: 'POST',
+        body: formData
+    }).then(response => {
+        if (response.redirected) {
+            const url = new URL(response.url);
+            const filename = url.pathname.split('/').pop();
+            pollProgress(filename);
+        }
+    });
+};
+
+document.getElementById('reset-btn').onclick = function(e) {
+    e.preventDefault();
+    fileInput.value = '';
+    selectedFile = null;
+    previewImg.style.display = 'none';
+    noImg.style.display = 'block';
+    defaultIcon.style.display = 'block';
+    chooseBtn.style.display = 'block';
+    overlayBtns.style.display = 'none';
+    resultTile.classList.add('d-none');
+};
+
+function pollProgress(filename) {
+    document.getElementById('progress-section').style.display = 'block';
+    document.getElementById('result-section').style.display = 'none';
+    function check() {
+        fetch('/progress_status')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('progress-bar').style.width = data.percent + '%';
+                document.getElementById('progress-bar').innerText = data.percent + '%';
+                document.getElementById('status').innerText = data.status;
+                if (data.percent >= 100) {
+                    showResult(filename);
+                } else {
+                    setTimeout(check, 1000);
+                }
+            });
+    }
+    check();
+}
+
+function showResult(filename) {
+    document.getElementById('progress-section').style.display = 'none';
+    document.getElementById('result-section').style.display = 'block';
+    const resultImg = document.getElementById('result-img');
+    resultImg.src = '/processed/' + filename;
+    document.getElementById('download-link').href = '/download/' + filename;
+}
+</script>
+</body>
+</html>
