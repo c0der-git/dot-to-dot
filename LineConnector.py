@@ -81,7 +81,7 @@ class LineConnector():
 
     def pointToLineIndex(self, point):
         for i in range(len(self.indexes)):
-            if point in self.lines[i / 2]:
+            if point in self.lines[i // 2]:
                 return i
 
     def solutionIndexesToLines(self, indexes):
