@@ -33,7 +33,7 @@ class LineConnector():
 
     def bestOfManyGreedys(self, amount):
         greedySolutions = []
-        print ('Finding Best Greedy')
+        print('Finding Best Greedy')
         for i in range(amount):
             sys.stdout.write('.')
             sys.stdout.flush()
@@ -41,8 +41,8 @@ class LineConnector():
             greedySolutions.append((solution, self.indexDistance(solution)))
 
         bestGreedy = min(greedySolutions, key=lambda x: x[1])
-        print ('Done')
-        print ('BestGreedy Length: ' + str(bestGreedy[1]))
+        print('Done')
+        print(f'BestGreedy Length: {bestGreedy[1]}')
         return self.solutionIndexesToLines(bestGreedy[0])
 
     def greedySolution(self):
@@ -50,7 +50,7 @@ class LineConnector():
         currentEnd = self.otherEndIndex(current)
         greedySol = [current]
 
-        freeList = self.indexes[:]
+        freeList = list(self.indexes)
         freeList.remove(current)
         freeList.remove(currentEnd)
 
@@ -87,7 +87,8 @@ class LineConnector():
     def solutionIndexesToLines(self, indexes):
         lines = []
         for i in indexes:
-            line = self.lines[i / 2]
+            line_index = i // 2  # Ensure integer division
+            line = self.lines[line_index]
             line = line[:]
             if i % 2 == 1:
                 line.reverse()

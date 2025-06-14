@@ -65,7 +65,7 @@ class EdgeDetector():
         selectionImage = self.createCannySelectionImage(width, height, cannyEdges)
         selectionImage.show()
 
-        print("Pick an image between 1-" + str(choose))
+        print(f"Pick an image between 1-{choose}")
         imagePick = int(input("Image Number: ")) - 1
         cannyPicked = cannyEdges[imagePick]
 

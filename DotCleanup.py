@@ -11,9 +11,9 @@ class DotCleanup():
 
         maxDimension = width if width > height else height
         self.maxLineLength = int(float(maxDimension) / LONGEST_LINE_DIVISION)
-        print ('Longest Line: ' + str(self.maxLineLength))
+        print(f'Longest Line: {self.maxLineLength}')
         self.minLineLength = int(float(maxDimension) / SMALLEST_LINE_DIVISION)
-        print ('Shortest Line: ' + str(self.minLineLength))
+        print(f'Shortest Line: {self.minLineLength}')
 
     def getCleanedDots(self):
         dots = self.dots[:]
@@ -45,7 +45,7 @@ class DotCleanup():
 
         pointsToIntroduce = divisions - 1
         pointsOnLine = self.getPointsInLine(start, end)
-        pointOnLineStep = len(pointsOnLine) / divisions
+        pointOnLineStep = len(pointsOnLine) // divisions
         for i in range(1, pointsToIntroduce + 1):
             line.append(pointsOnLine[pointOnLineStep * i])
 

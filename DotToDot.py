@@ -18,17 +18,17 @@ TEMP_IMG_NAME = "temp_img.jpg"
 GREEDY_SOLUTIONS_TO_TRY = 50
 
 def timeFunction(function, *args):
-    start = time.clock()
+    start = time.perf_counter()
     returnValue = function(*args)
-    end = time.clock()
-    print ('--- ' + str(function.__name__) + ' --- Time: ' + str(end - start) + ' ---')
+    end = time.perf_counter()
+    print(f'--- {function.__name__} --- Time: {end - start} ---')
     return returnValue
 
 def makeDotToDot(fullFilePath, intermediateSteps = False):
     # Getting proper in/out names and image dimensions.
     fileName = os.path.split(fullFilePath)[-1]
-    outPathJpg = 'out/jpg/' + fileName
-    outPathPdf = 'out/pdf/' + os.path.splitext(fileName)[0] + '.pdf'
+    outPathJpg = 'output/jpg/' + fileName
+    outPathPdf = 'output/pdf/' + os.path.splitext(fileName)[0] + '.pdf'
 
     imageData = Image.open(fullFilePath)
     width = imageData.width
@@ -43,7 +43,8 @@ def makeDotToDot(fullFilePath, intermediateSteps = False):
     if intermediateSteps:
         outCanny = IntermediateImage([edgeMatrix.points], width, height)
         outCanny.colorWhiteSegments()
-        outCanny.saveImage("intermediate/canny.jpg")
+        os.makedirs('output/intermediate', exist_ok=True)
+        outCanny.saveImage("output/intermediate/canny.jpg")
 
     # Trace following step
     edgeFollower = EdgeFollower(edgeMatrix, width, height)
@@ -52,7 +53,7 @@ def makeDotToDot(fullFilePath, intermediateSteps = False):
     if intermediateSteps:
         outEdges = IntermediateImage(traces, width, height)
         outEdges.colorAllSegments()
-        outEdges.saveImage("intermediate/edges.jpg")
+        outEdges.saveImage("output/intermediate/edges.jpg")
 
     # Trace to line conversion
     traceConverter = TraceConverter(traces)
@@ -60,9 +61,9 @@ def makeDotToDot(fullFilePath, intermediateSteps = False):
 
     if intermediateSteps:
         nonConnectedLinesOut = OutputNonConnectedLines(lines, width, height)
-        nonConnectedLinesOut.saveImage("intermediate/lines.jpg")
+        nonConnectedLinesOut.saveImage("output/intermediate/lines.jpg")
 
-    print ('Lines to connect: ' + str(len(lines)))
+    print(f'Lines to connect: {len(lines)}')
 
     # Finding the best greedy solution
     lineConnector = LineConnector(lines)
@@ -70,16 +71,16 @@ def makeDotToDot(fullFilePath, intermediateSteps = False):
     greedyPoints = [point for sublist in greedyLines for point in sublist]
 
     if intermediateSteps:
-            outGreedy = OutputImage(greedyPoints, width, height, True, False, "intermediate/notClean.pdf", "intermediate/notClean.jpg")
+            outGreedy = OutputImage(greedyPoints, width, height, True, False, "output/intermediate/notClean.pdf", "output/intermediate/notClean.jpg")
 
     # Cleaning up too close/far away dots
-    print ('Dots before clean: ' + str(len(greedyPoints)))
+    print(f'Dots before clean: {len(greedyPoints)}')
     dotCleaner = DotCleanup(greedyPoints, width, height)
     cleanPoints = timeFunction(dotCleaner.getCleanedDots)
     dotsInImage = len(cleanPoints)
 
     # Output image
-    print ('Dots in image: ' + str(dotsInImage))
+    print(f'Dots in image: {dotsInImage}')
     out = OutputImage(cleanPoints, width, height, True, False, outPathPdf)
     out.saveImage(outPathJpg)
 
@@ -90,8 +91,8 @@ def makeMaxSizeDot(fullFilePath, maxDots):
     dotsInImage = maxDots + 1
 
     fileName = os.path.split(fullFilePath)[-1]
-    outPathJpg = 'out/jpg/' + fileName
-    outPathPdf = 'out/pdf/' + os.path.splitext(fileName)[0] + '.pdf'
+    outPathJpg = 'output/jpg/' + fileName
+    outPathPdf = 'output/pdf/' + os.path.splitext(fileName)[0] + '.pdf'
 
     # Repeat complete makeDotToDot process, decreasing image resolution, until
     # few enough dots

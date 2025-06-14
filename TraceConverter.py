@@ -18,7 +18,7 @@ class TraceConverter():
         if not distanceThreshold:
             self.distanceThreshold = DISTANCE_THRESHOLD
         else:
-            print ('--- Threshold: ' + str(distanceThreshold) + ' ---')
+            print(f'--- Threshold: {distanceThreshold} ---')
             self.distanceThreshold = distanceThreshold
 
     def getLines(self):
@@ -40,7 +40,7 @@ class TraceConverter():
 
             lines.append(self.traceToLine(trace))
 
-        print ('Done')
+        print('Done')
         return lines
 
     def traceToLine(self, trace):

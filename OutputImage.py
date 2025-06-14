@@ -1,6 +1,7 @@
 import math
 import cairocffi as cairo
 from PIL import Image, ImageDraw, ImageFont
+import os
 
 BASE_IMAGE_WIDTH = 5000
 BASE_LIMIT = 7000
@@ -25,9 +26,9 @@ class OutputImage():
         self.originalWidth = originalWidth
         self.originalHeight = originalHeight
         if not pdfOutput:
-            pdfOutput = "out/dots.pdf"
+            pdfOutput = "output/dots.pdf"
         if not jpgOutput:
-            jpgOutput = "out/dots.jpg"
+            jpgOutput = "output/dots.jpg"
 
         self.imageRatio = float(self.originalHeight) / float(self.originalWidth)
 
@@ -89,8 +90,8 @@ class OutputImage():
 
     def saveImage(self, path = None):
         if not path:
-            path = 'out/dots.jpg'
-
+            path = 'output/dots.jpg'
+        os.makedirs(os.path.dirname(path), exist_ok=True)
         self.image.save(path)
 
     def showImage(self):
@@ -98,6 +99,7 @@ class OutputImage():
 
 
     def drawAsPdf(self, drawLines, path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
         ps = cairo.PDFSurface(path, int(self.fullWidth), int(self.fullHeight))
         cr = cairo.Context(ps)
 
@@ -235,7 +237,14 @@ class OutputImage():
         return True
 
     def chooseTextPoint(self, pointX, pointY, number, ensureSpace):
-        textWidth, textHeight = self.draw.textsize(str(number), self.font)
+        # Use textbbox for modern Pillow, fallback to textsize for older versions
+        try:
+            bbox = self.draw.textbbox((0, 0), str(number), font=self.font)
+            textWidth = bbox[2] - bbox[0]
+            textHeight = bbox[3] - bbox[1]
+        except AttributeError:
+            textWidth, textHeight = self.draw.textsize(str(number), self.font)
+
         possibleTextPositions = [
             (pointX + 2, pointY + 2),
             (pointX + 2, pointY - 2 - textHeight),
@@ -254,7 +263,7 @@ class OutputImage():
 
         if not spaceExists:
             if ensureSpace:
-                print ('--- Overlap! No Space for Point: (' + str(pointX) + ', ' + str(pointY) + ') ---')
+                print(f'--- Overlap! No Space for Point: ({pointX}, {pointY}) ---')
             return [textX, textY, possibleTextPositions.index((textX, textY)), False]
 
         return [textX, textY, possibleTextPositions.index((textX, textY)), True]

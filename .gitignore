@@ -3,10 +3,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Virtual Enviroment
-venv/*
+# Virtual Environment
+venv/
 
 # Vim
 *.swp
 
-out/*
+# Output and input folders
+output/
+input/

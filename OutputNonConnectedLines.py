@@ -22,7 +22,7 @@ class OutputNonConnectedLines():
         self.xScaling = float(BASE_IMAGE_WIDTH) / float(originalWidth)
         self.yScaling = float(imageHeight) / float(originalHeight)
 
-        print ("Dimensions: (" + str(BASE_IMAGE_WIDTH) + ", " + str(imageHeight) + ")")
+        print(f"Dimensions: ({BASE_IMAGE_WIDTH}, {imageHeight})")
 
         self.image = Image.new("RGB", (BASE_IMAGE_WIDTH, int(imageHeight)), color=(255, 255, 255))
 

@@ -2,7 +2,14 @@ import sys
 import math
 import numpy as np
 import warnings
-warnings.simplefilter('ignore', np.RankWarning)
+try:
+    from numpy.polynomial.polynomial import RankWarning
+except ImportError:
+    try:
+        from numpy import RankWarning
+    except ImportError:
+        RankWarning = Warning  # fallback if not found
+warnings.simplefilter('ignore', RankWarning)
 
 from DistanceUtils import lineAngle
 from EdgeMatrix import EdgeMatrix
@@ -47,7 +54,7 @@ class EdgeFollower():
         print('Done')
         return traces
 
-    def makeTrace(self, startingPoint, limit = sys.maxint, persistent = True):
+    def makeTrace(self, startingPoint, limit = sys.maxsize, persistent = True):
         self.edgeMatrix.markFalseAt(startingPoint)
         trace = [startingPoint]
         nextNeighbours = self.edgeMatrix.getTrueNeighbours(startingPoint)
