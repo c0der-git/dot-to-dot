@@ -25,7 +25,20 @@ def process_image(filename):
     try:
         progress['percent'] = 10
         progress['status'] = 'Processing...'
+        # Step 1: Preprocessing (simulate)
+        import time
+        time.sleep(0.5)
+        progress['percent'] = 30
+        progress['status'] = 'Detecting edges...'
+        # Step 2: Edge detection (simulate)
+        time.sleep(0.5)
+        progress['percent'] = 60
+        progress['status'] = 'Generating dots...'
+        # Step 3: Dot generation (simulate)
         makeMaxSizeDot(os.path.join(UPLOAD_FOLDER, filename), 800)
+        progress['percent'] = 90
+        progress['status'] = 'Finalizing...'
+        time.sleep(0.3)
         progress['percent'] = 100
         progress['status'] = 'Done!'
     except Exception as e:

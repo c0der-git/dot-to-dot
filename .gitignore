@@ -9,6 +9,9 @@ venv/
 # Vim
 *.swp
 
+# Jpg
+*.jpg
+
 # Output and input folders
 output/
 input/

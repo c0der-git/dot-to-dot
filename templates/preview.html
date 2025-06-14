@@ -28,7 +28,7 @@
                 <div class="card-body d-flex align-items-center justify-content-center" style="min-height:300px;">
                     {% if processed_exists %}
                         <img src="/processed/{{ filename }}" class="img-fluid border" alt="Processed">
-                        <a href="/download/{{ filename }}" class="btn btn-success mt-3 w-100">Download PDF Version</a>
+                        <a href="/download/{{ filename.rsplit('.', 1)[0] }}.pdf" class="btn btn-success mt-3 w-100">Download PDF Version</a>
                     {% else %}
                         <div class="alert alert-warning">Processed image not found.</div>
                     {% endif %}
